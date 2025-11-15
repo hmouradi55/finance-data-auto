@@ -5,10 +5,16 @@ import yfinance as yf
 import requests
 from alpha_vantage.fundamentaldata import FundamentalData
 
-#CONFIGURATION
+
+OUTPUT_FOLDER = "data"
+if not os.path.exists(OUTPUT_FOLDER):
+    os.makedirs(OUTPUT_FOLDER)
+
+
 START_DATE = "2005-01-01"
 API_KEY = os.environ.get("ALPHA_VANTAGE_KEY")
 TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "ORCL", "INTC", "ADBE", "CSCO", "CRM"]
+
 
 if not API_KEY:
     raise ValueError("La clé API Alpha Vantage est manquante dans les secrets.")
@@ -21,7 +27,7 @@ def get_prices_yfinance(symbol):
         if not hist.empty:
             hist.reset_index(inplace=True)
             
-            filename = f"{symbol}_prices.csv"
+            filename = f"{OUTPUT_FOLDER}/{symbol}_prices.csv"
             hist.to_csv(filename, index=False)
             print(f"Prix sauvegardés : {filename}")
         else:
@@ -36,19 +42,19 @@ def get_fundamentals_alpha(symbol):
     try:
         # Income Statement 
         income_data, _ = fd.get_income_statement_quarterly(symbol)
-        income_data.to_csv(f"{symbol}_financials_income.csv", index=False)
+        income_data.to_csv(f"{OUTPUT_FOLDER}/{symbol}_financials_income.csv", index=False)
         print(f"Income Statement OK")
         time.sleep(2) 
 
         # Balance Sheet 
         balance_data, _ = fd.get_balance_sheet_quarterly(symbol)
-        balance_data.to_csv(f"{symbol}_financials_balance.csv", index=False)
+        balance_data.to_csv(f"{OUTPUT_FOLDER}/{symbol}_financials_balance.csv", index=False)
         print(f"Balance Sheet OK")
         time.sleep(2)
 
         # Cash Flow
         cash_data, _ = fd.get_cash_flow_quarterly(symbol)
-        cash_data.to_csv(f"{symbol}_financials_cashflow.csv", index=False)
+        cash_data.to_csv(f"{OUTPUT_FOLDER}/{symbol}_financials_cashflow.csv", index=False)
         print(f"Cash Flow OK")
         
     except Exception as e:
@@ -56,7 +62,6 @@ def get_fundamentals_alpha(symbol):
         if "Thank you" in str(e):
             print("LIMITE API ATTEINTE.")
 
-#EXÉCUTION PRINCIPALE
 
 for t in TICKERS:
     get_prices_yfinance(t)
