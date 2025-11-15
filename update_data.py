@@ -6,6 +6,7 @@ import requests
 from alpha_vantage.fundamentaldata import FundamentalData
 
 #CONFIGURATION
+START_DATE = "2005-01-01"
 API_KEY = os.environ.get("ALPHA_VANTAGE_KEY")
 TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "ORCL", "INTC"]
 
@@ -20,10 +21,9 @@ session.headers.update({
 })
 
 def get_prices_yfinance(symbol):
-    print(f"[yfinance] Téléchargement des prix pour {symbol}...")
     try:
         ticker = yf.Ticker(symbol, session=session)
-        hist = ticker.history(period="max")
+        hist = yf.download(symbol, start=START_DATE, interval="1d", session=session)
         
         if not hist.empty:
             hist.reset_index(inplace=True)
@@ -43,19 +43,19 @@ def get_fundamentals_alpha(symbol):
     try:
         # Income Statement 
         income_data, _ = fd.get_income_statement_quarterly(symbol)
-        income_data.to_csv(f"{symbol}_financials_income.csv")
+        income_data.to_csv(f"{symbol}_financials_income.csv", index=False)
         print(f"Income Statement OK")
-        time.sleep(2) # Petite pause de sécurité
+        time.sleep(2) 
 
         # Balance Sheet 
         balance_data, _ = fd.get_balance_sheet_quarterly(symbol)
-        balance_data.to_csv(f"{symbol}_financials_balance.csv")
+        balance_data.to_csv(f"{symbol}_financials_balance.csv", index=False)
         print(f"Balance Sheet OK")
         time.sleep(2)
 
         # Cash Flow
         cash_data, _ = fd.get_cash_flow_quarterly(symbol)
-        cash_data.to_csv(f"{symbol}_financials_cashflow.csv")
+        cash_data.to_csv(f"{symbol}_financials_cashflow.csv", index=False)
         print(f"Cash Flow OK")
         
     except Exception as e:
@@ -66,7 +66,6 @@ def get_fundamentals_alpha(symbol):
 #EXÉCUTION PRINCIPALE
 
 for t in TICKERS:
-    # Récupérer les prix 
     get_prices_yfinance(t)
     get_fundamentals_alpha(t)
     
