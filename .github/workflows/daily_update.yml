@@ -33,7 +33,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add *.csv
+          git add data/*.csv
           # Le commit n'échouera pas s'il n'y a pas de changement (ex: bourse fermée)
           git commit -m "Mise à jour automatique des données" || exit 0
           git push
