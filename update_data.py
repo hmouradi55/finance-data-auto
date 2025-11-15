@@ -15,7 +15,7 @@ if not API_KEY:
 
 def get_prices_yfinance(symbol):
     try:
-        ticker = yf.Ticker(symbol, session=session)
+        ticker = yf.Ticker(symbol)
         hist = yf.download(symbol, start=START_DATE, interval="1d")
         
         if not hist.empty:
