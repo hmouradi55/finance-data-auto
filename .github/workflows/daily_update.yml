@@ -1,0 +1,42 @@
+name: Daily Finance Update
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code (Checkout)
+        uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Installer les librairies
+        run: |
+          pip install pandas alpha_vantage yfinance requests lxml
+
+      - name: Lancer le script Python
+        env:
+          ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
+        run: python update_data.py
+
+      - name: Sauvegarder les changements (Commit & Push)
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.csv
+          # Le commit n'échouera pas s'il n'y a pas de changement (ex: bourse fermée)
+          git commit -m "Mise à jour automatique des données" || exit 0
+          git push
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
