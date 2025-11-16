@@ -53,14 +53,14 @@ def get_fundamentals_alpha(symbol):
         income_data['Ticker'] = symbol
         income_data.to_csv(f"{OUTPUT_FOLDER}/{symbol}_financials_income.csv", index=False)
         print(f"Income Statement OK")
-        time.sleep(2) 
+        time.sleep(5) 
 
         # Balance Sheet 
         balance_data, _ = fd.get_balance_sheet_quarterly(symbol)
         balance_data['Ticker'] = symbol
         balance_data.to_csv(f"{OUTPUT_FOLDER}/{symbol}_financials_balance.csv", index=False)
         print(f"Balance Sheet OK")
-        time.sleep(2)
+        time.sleep(5)
 
         # Cash Flow
         cash_data, _ = fd.get_cash_flow_quarterly(symbol)
@@ -76,6 +76,7 @@ def get_fundamentals_alpha(symbol):
 
 for t in TICKERS:
     get_prices_yfinance(t)
+    time.sleep(5)
     get_fundamentals_alpha(t)
     
     print("-" * 30)
